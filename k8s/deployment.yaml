@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aks-ci-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aks-ci-app
+  template:
+    metadata:
+      labels:
+        app: aks-ci-app
+    spec:
+      containers:
+      - name: aks-ci-app
+        image: <ACR_LOGIN_SERVER>/aks-ci-app:latest
+        ports:
+        - containerPort: 80

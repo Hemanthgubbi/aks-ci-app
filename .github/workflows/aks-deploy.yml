@@ -1,0 +1,35 @@
+name: AKS CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: guruacr2025.azurecr.io/aks-ci-app:v1
+
+      - name: AKS Set Context
+        run: az aks get-credentials --resource-group myrg --name myAKS
+
+      - name: Deploy to AKS
+        run: |
+          kubectl set image deployment/aks-ci-app aks-ci-app=guruacr2025.azurecr.io/aks-ci-app:v1
